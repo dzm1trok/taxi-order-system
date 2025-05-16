@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { MapPin, Car, Clock, CreditCard, Banknote } from "lucide-react"
 import { useRouter } from "next/navigation"
+import Map from "@/app/components/Map"
 
 export default function NewOrderPage() {
   const router = useRouter()
@@ -103,8 +104,8 @@ export default function NewOrderPage() {
                 </div>
               </div>
 
-              <div className="h-64 w-full bg-muted rounded-md flex items-center justify-center">
-                <p className="text-muted-foreground">Карта маршрута</p>
+              <div className="h-64 w-full bg-muted rounded-md">
+                <Map className="h-full w-full rounded-md" />
               </div>
             </CardContent>
             <CardFooter className="flex justify-between">
