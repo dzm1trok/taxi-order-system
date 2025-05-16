@@ -4,6 +4,8 @@ import { useEffect, useRef } from "react"
 
 interface MapProps {
   className?: string
+  from: string
+  to: string
 }
 
 declare global {
@@ -12,17 +14,19 @@ declare global {
   }
 }
 
-export default function Map({ className }: MapProps) {
+export default function Map({ className, from, to }: MapProps) {
   const mapRef = useRef<HTMLDivElement>(null)
+  const mapInstance = useRef<any>(null)
 
+  // Инициализация карты только один раз
   useEffect(() => {
     function createMap() {
       if (window.ymaps) {
         window.ymaps.ready(() => {
           if (mapRef.current) {
             mapRef.current.innerHTML = ""
-            new window.ymaps.Map(mapRef.current, {
-              center: [52.0976, 23.7341],
+            mapInstance.current = new window.ymaps.Map(mapRef.current, {
+              center: [52.0976, 23.7341], // Брест, Беларусь
               zoom: 12,
               controls: ["zoomControl", "fullscreenControl"]
             })
@@ -31,7 +35,6 @@ export default function Map({ className }: MapProps) {
       }
     }
 
-    // Проверяем, был ли уже добавлен скрипт
     if (!document.getElementById("yandex-maps-script")) {
       const script = document.createElement("script")
       script.id = "yandex-maps-script"
@@ -39,7 +42,6 @@ export default function Map({ className }: MapProps) {
       script.async = true
       document.body.appendChild(script)
       script.onload = () => {
-        // Ждём появления window.ymaps
         const waitForYmaps = setInterval(() => {
           if (window.ymaps) {
             clearInterval(waitForYmaps)
@@ -48,7 +50,6 @@ export default function Map({ className }: MapProps) {
         }, 50)
       }
     } else {
-      // Скрипт уже есть, но ymaps может быть ещё не загружен
       const waitForYmaps = setInterval(() => {
         if (window.ymaps) {
           clearInterval(waitForYmaps)
@@ -61,6 +62,32 @@ export default function Map({ className }: MapProps) {
       if (mapRef.current) mapRef.current.innerHTML = ""
     }
   }, [])
+
+  // Геокодирование и отображение меток при изменении адресов
+  useEffect(() => {
+    if (!window.ymaps || !mapInstance.current) return
+    const map = mapInstance.current
+    map.geoObjects.removeAll()
+
+    // Геокодируем и ставим метки
+    if (from) {
+      window.ymaps.geocode(from + ', Беларусь').then((res: any) => {
+        const firstGeoObject = res.geoObjects.get(0)
+        if (firstGeoObject) {
+          map.geoObjects.add(new window.ymaps.Placemark(firstGeoObject.geometry.getCoordinates(), { balloonContent: from }, { preset: 'islands#redIcon' }))
+          map.setCenter(firstGeoObject.geometry.getCoordinates())
+        }
+      })
+    }
+    if (to) {
+      window.ymaps.geocode(to + ', Беларусь').then((res: any) => {
+        const firstGeoObject = res.geoObjects.get(0)
+        if (firstGeoObject) {
+          map.geoObjects.add(new window.ymaps.Placemark(firstGeoObject.geometry.getCoordinates(), { balloonContent: to }, { preset: 'islands#blueIcon' }))
+        }
+      })
+    }
+  }, [from, to])
 
   return <div ref={mapRef} className={className} />
 } 

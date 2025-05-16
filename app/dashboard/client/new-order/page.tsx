@@ -18,6 +18,8 @@ export default function NewOrderPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [orderStep, setOrderStep] = useState(1)
+  const [fromAddress, setFromAddress] = useState("ул. Ленина, 10")
+  const [toAddress, setToAddress] = useState("")
 
   const handleCreateOrder = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -83,7 +85,8 @@ export default function NewOrderPage() {
                       id="from-address"
                       placeholder="Адрес отправления"
                       className="pl-8"
-                      defaultValue="ул. Ленина, 10"
+                      value={fromAddress}
+                      onChange={e => setFromAddress(e.target.value)}
                     />
                   </div>
                   <Button variant="ghost" size="icon" className="ml-2">
@@ -96,7 +99,7 @@ export default function NewOrderPage() {
                 <div className="flex">
                   <div className="relative flex-1">
                     <MapPin className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input id="to-address" placeholder="Адрес назначения" className="pl-8" />
+                    <Input id="to-address" placeholder="Адрес назначения" className="pl-8" value={toAddress} onChange={e => setToAddress(e.target.value)} />
                   </div>
                   <Button variant="ghost" size="icon" className="ml-2">
                     <MapPin className="h-4 w-4" />
@@ -105,7 +108,7 @@ export default function NewOrderPage() {
               </div>
 
               <div className="h-64 w-full bg-muted rounded-md">
-                <Map className="h-full w-full rounded-md" />
+                <Map className="h-full w-full rounded-md" from={fromAddress} to={toAddress} />
               </div>
             </CardContent>
             <CardFooter className="flex justify-between">
