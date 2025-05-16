@@ -23,6 +23,7 @@ export default function NewOrderPage() {
   const [distance, setDistance] = useState(0)
   const [duration, setDuration] = useState(0)
   const [carClass, setCarClass] = useState("economy")
+  const [comment, setComment] = useState("")
   let pricePerKm = 0.75
   if (carClass === "comfort") pricePerKm = 1.5
   if (carClass === "business") pricePerKm = 2
@@ -32,11 +33,29 @@ export default function NewOrderPage() {
     e.preventDefault()
     setLoading(true)
 
-    // Имитация создания заказа
-    setTimeout(() => {
-      setLoading(false)
+    // client_id будет определяться на сервере из сессии
+    const orderData = {
+      from_address: fromAddress,
+      to_address: toAddress,
+      car_class: carClass,
+      price: price,
+      distance: distance / 1000, // в км
+      comment: comment,
+      status: 'pending'
+    }
+
+    const res = await fetch('/api/orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(orderData)
+    })
+
+    if (res.ok) {
       router.push("/dashboard/client/orders")
-    }, 1500)
+    } else {
+      setLoading(false)
+      alert('Ошибка при создании заказа')
+    }
   }
 
   return (
@@ -202,7 +221,7 @@ export default function NewOrderPage() {
 
               <div className="space-y-2">
                 <Label htmlFor="comment">Комментарий для водителя</Label>
-                <Textarea id="comment" placeholder="Например: подъезд №2, код домофона 1234" />
+                <Textarea id="comment" placeholder="Например: подъезд №2, код домофона 1234" value={comment} onChange={e => setComment(e.target.value)} />
               </div>
             </CardContent>
             <CardFooter className="flex justify-between">
