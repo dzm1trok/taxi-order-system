@@ -29,12 +29,22 @@ export default function NewOrderPage() {
   if (carClass === "business") pricePerKm = 2
   const price = distance ? (Math.ceil(distance / 1000) * pricePerKm) : 0
 
+  // Получение email авторизованного пользователя (пример: из localStorage или контекста)
+  const userEmail = typeof window !== 'undefined' ? localStorage.getItem('userEmail') || '' : '';
+
   const handleCreateOrder = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
 
-    // client_id будет определяться на сервере из сессии
+    if (!userEmail) {
+      alert('Ошибка: не найден email пользователя. Пожалуйста, войдите в систему.');
+      setLoading(false);
+      return;
+    }
+    console.log('Создание заказа, email:', userEmail);
+
     const orderData = {
+      email: userEmail,
       from_address: fromAddress,
       to_address: toAddress,
       car_class: carClass,
@@ -43,6 +53,7 @@ export default function NewOrderPage() {
       comment: comment,
       status: 'pending'
     }
+    console.log('orderData:', orderData);
 
     const res = await fetch('/api/orders', {
       method: 'POST',
@@ -51,10 +62,12 @@ export default function NewOrderPage() {
     })
 
     if (res.ok) {
-      router.push("/dashboard/client/orders")
+      router.push("/dashboard/client/orders?email=" + encodeURIComponent(userEmail))
     } else {
       setLoading(false)
-      alert('Ошибка при создании заказа')
+      const error = await res.json();
+      alert('Ошибка при создании заказа: ' + (error?.error || '')); 
+      console.log('Ошибка при создании заказа:', error);
     }
   }
 

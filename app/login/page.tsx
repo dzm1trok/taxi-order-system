@@ -46,6 +46,7 @@ export default function LoginPage() {
 
       // Store user data in localStorage or state management solution
       localStorage.setItem("user", JSON.stringify(data.user))
+      localStorage.setItem("userEmail", data.user.email)
       
       toast.success("Вход выполнен успешно!")
       router.push(`/dashboard/${data.user.role}`)

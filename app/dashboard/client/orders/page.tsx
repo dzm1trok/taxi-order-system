@@ -12,9 +12,10 @@ export default function OrdersPage() {
   const [orders, setOrders] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState("all")
+  const userEmail = typeof window !== 'undefined' ? localStorage.getItem('userEmail') || '' : '';
 
   useEffect(() => {
-    fetch("/api/orders")
+    fetch(`/api/orders?email=${encodeURIComponent(userEmail)}`)
       .then(res => res.json())
       .then(data => {
         setOrders(Array.isArray(data) ? data : [])
