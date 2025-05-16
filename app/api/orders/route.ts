@@ -32,11 +32,65 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function GET(req: NextRequest) {
+export async function PATCH(req: NextRequest) {
   try {
     // const session = await getServerSession(authOptions)
+    // const driver_id = session?.user?.id
+    const { id, action } = await req.json();
+    let status = "";
+    if (action === "accept") status = "accepted";
+    if (action === "decline") status = "cancelled";
+    if (!status) return NextResponse.json({ error: "Некорректное действие" }, { status: 400 });
+
+    // driver_id из сессии (пока для теста driver_id = 1)
+    const driver_id = 1;
+
+    if (status === "accepted") {
+      await pool.execute(
+        "UPDATE Orders SET status = ?, driver_id = ? WHERE id = ?",
+        [status, driver_id, id]
+      );
+    } else {
+      await pool.execute(
+        "UPDATE Orders SET status = ?, driver_id = ? WHERE id = ?",
+        [status, driver_id, id]
+      );
+    }
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    return NextResponse.json({ error: "Ошибка при обновлении заказа", details: String(error) }, { status: 500 });
+  }
+}
+
+export async function GET(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url);
+    // Если есть ?available=1 — возвращаем только pending
+    if (searchParams.get('available') === '1') {
+      const [rows] = await pool.query(
+        'SELECT * FROM Orders WHERE status = ? ORDER BY created_at DESC',
+        ['pending']
+      );
+      return NextResponse.json(rows, { status: 200 });
+    }
+    // Для вкладки current/declined для водителя
+    if (searchParams.get('driver_id')) {
+      const driver_id = Number(searchParams.get('driver_id'));
+      const status = searchParams.get('status');
+      let query = 'SELECT * FROM Orders WHERE driver_id = ?';
+      let params: (string|number)[] = [driver_id];
+      if (status) {
+        query += ' AND status = ?';
+        params.push(String(status));
+      }
+      query += ' ORDER BY created_at DESC';
+      const [rows] = await pool.query(query, params);
+      return NextResponse.json(rows, { status: 200 });
+    }
+    // Для клиента (client_id=1 для примера)
+    // const session = await getServerSession(authOptions)
     // const client_id = session?.user?.id
-    const client_id = 1 // для примера
+    const client_id = 1
     const [rows] = await pool.query(
       'SELECT * FROM Orders WHERE client_id = ? ORDER BY created_at DESC',
       [client_id]
