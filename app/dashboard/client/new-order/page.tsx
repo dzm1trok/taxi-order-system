@@ -20,6 +20,13 @@ export default function NewOrderPage() {
   const [orderStep, setOrderStep] = useState(1)
   const [fromAddress, setFromAddress] = useState("ул. Ленина, 10")
   const [toAddress, setToAddress] = useState("")
+  const [distance, setDistance] = useState(0)
+  const [duration, setDuration] = useState(0)
+  const [carClass, setCarClass] = useState("economy")
+  let pricePerKm = 0.75
+  if (carClass === "comfort") pricePerKm = 1.5
+  if (carClass === "business") pricePerKm = 2
+  const price = distance ? (Math.ceil(distance / 1000) * pricePerKm) : 0
 
   const handleCreateOrder = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -108,7 +115,7 @@ export default function NewOrderPage() {
               </div>
 
               <div className="h-64 w-full bg-muted rounded-md">
-                <Map className="h-full w-full rounded-md" from={fromAddress} to={toAddress} />
+                <Map className="h-full w-full rounded-md" from={fromAddress} to={toAddress} onRouteChange={(dist, dur) => { setDistance(dist); setDuration(dur); }} />
               </div>
             </CardContent>
             <CardFooter className="flex justify-between">
@@ -129,7 +136,7 @@ export default function NewOrderPage() {
             <CardContent className="space-y-6">
               <div className="space-y-2">
                 <Label>Класс автомобиля</Label>
-                <Tabs defaultValue="economy">
+                <Tabs value={carClass} onValueChange={setCarClass}>
                   <TabsList className="grid grid-cols-3 w-full">
                     <TabsTrigger value="economy">Эконом</TabsTrigger>
                     <TabsTrigger value="comfort">Комфорт</TabsTrigger>
@@ -145,8 +152,7 @@ export default function NewOrderPage() {
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="font-medium">250 ₽</p>
-                        <p className="text-sm text-muted-foreground">~10 мин</p>
+                        <p className="font-medium">{distance ? (Math.ceil(distance / 1000) * 0.75).toFixed(2) : '0.00'} ₽</p>
                       </div>
                     </div>
                   </TabsContent>
@@ -160,8 +166,7 @@ export default function NewOrderPage() {
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="font-medium">350 ₽</p>
-                        <p className="text-sm text-muted-foreground">~8 мин</p>
+                        <p className="font-medium">{distance ? (Math.ceil(distance / 1000) * 1.5).toFixed(2) : '0.00'} ₽</p>
                       </div>
                     </div>
                   </TabsContent>
@@ -175,8 +180,7 @@ export default function NewOrderPage() {
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="font-medium">550 ₽</p>
-                        <p className="text-sm text-muted-foreground">~12 мин</p>
+                        <p className="font-medium">{distance ? (Math.ceil(distance / 1000) * 2).toFixed(2) : '0.00'} ₽</p>
                       </div>
                     </div>
                   </TabsContent>
@@ -192,10 +196,6 @@ export default function NewOrderPage() {
                       <Clock className="h-4 w-4" />
                       Как можно скорее
                     </Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="scheduled" id="time-scheduled" />
-                    <Label htmlFor="time-scheduled">Запланировать</Label>
                   </div>
                 </RadioGroup>
               </div>
@@ -246,20 +246,24 @@ export default function NewOrderPage() {
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Маршрут:</span>
-                    <span>ул. Ленина, 10 → Неизвестно</span>
+                    <span>{fromAddress || 'Неизвестно'} → {toAddress || 'Неизвестно'}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Класс:</span>
-                    <span>Эконом</span>
+                    <span>{carClass === "economy" ? "Эконом" : carClass === "comfort" ? "Комфорт" : "Бизнес"}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Время подачи:</span>
                     <span>Как можно скорее</span>
                   </div>
-                  <div className="flex justify-between font-medium pt-2 border-t">
-                    <span>Итого:</span>
-                    <span>250 ₽</span>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Расстояние:</span>
+                    <span>{distance ? (distance / 1000).toFixed(2) + ' км' : '-'}</span>
                   </div>
+                </div>
+                <div className="flex justify-between font-medium pt-2 border-t">
+                  <span>Итого:</span>
+                  <span>{price ? price.toFixed(2) : '0.00'} ₽</span>
                 </div>
               </div>
             </CardContent>

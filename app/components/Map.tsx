@@ -6,6 +6,7 @@ interface MapProps {
   className?: string
   from: string
   to: string
+  onRouteChange?: (distance: number, duration: number) => void // distance в метрах, duration в минутах
 }
 
 declare global {
@@ -14,7 +15,7 @@ declare global {
   }
 }
 
-export default function Map({ className, from, to }: MapProps) {
+export default function Map({ className, from, to, onRouteChange }: MapProps) {
   const mapRef = useRef<HTMLDivElement>(null)
   const mapInstance = useRef<any>(null)
 
@@ -63,13 +64,36 @@ export default function Map({ className, from, to }: MapProps) {
     }
   }, [])
 
-  // Геокодирование и отображение меток при изменении адресов
+  // Геокодирование и отображение меток/маршрута при изменении адресов
   useEffect(() => {
     if (!window.ymaps || !mapInstance.current) return
     const map = mapInstance.current
     map.geoObjects.removeAll()
 
-    // Геокодируем и ставим метки
+    if (from && to) {
+      // Строим маршрут
+      window.ymaps.route(
+        [from + ', Беларусь', to + ', Беларусь'],
+        { routingMode: "auto" }
+      ).then((route: any) => {
+        const distance = route.getLength() // в метрах
+        let duration = route.getTime() / 60 / 1000 // в минутах
+        if (!duration || duration === 0) {
+          const paths = route.getPaths()
+          let totalDuration = 0
+          for (let i = 0; i < paths.getLength(); i++) {
+            const segDuration = paths.get(i).getProperties().duration?.value || 0
+            totalDuration += segDuration
+          }
+          duration = totalDuration / 60 // из секунд в минуты
+        }
+        if (onRouteChange) onRouteChange(distance, duration)
+        map.geoObjects.add(route)
+      })
+      return
+    }
+
+    // Если только метки
     if (from) {
       window.ymaps.geocode(from + ', Беларусь').then((res: any) => {
         const firstGeoObject = res.geoObjects.get(0)
@@ -87,6 +111,7 @@ export default function Map({ className, from, to }: MapProps) {
         }
       })
     }
+    if (onRouteChange) onRouteChange(0, 0)
   }, [from, to])
 
   return <div ref={mapRef} className={className} />
