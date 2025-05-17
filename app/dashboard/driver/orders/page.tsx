@@ -107,7 +107,7 @@ export default function DriverOrdersPage() {
                       <p className="text-xs text-muted-foreground">{order.car_class === "economy" ? "Эконом" : order.car_class === "comfort" ? "Комфорт" : "Бизнес"}</p>
                     </div>
                     <div className="text-right">
-                      <p className="font-medium">{order.price ? Number(order.price).toFixed(2) : "-"} ₽</p>
+                      <p className="font-medium">{order.price ? Number(order.price).toFixed(2) : "-"} BYN</p>
                     </div>
                   </div>
                   {order.comment && (
@@ -157,7 +157,7 @@ export default function DriverOrdersPage() {
                       <p className="text-xs text-muted-foreground">{order.car_class === "economy" ? "Эконом" : order.car_class === "comfort" ? "Комфорт" : "Бизнес"}</p>
                     </div>
                     <div className="text-right">
-                      <p className="font-medium">{order.price ? Number(order.price).toFixed(2) : "-"} ₽</p>
+                      <p className="font-medium">{order.price ? Number(order.price).toFixed(2) : "-"} BYN</p>
                     </div>
                   </div>
                   {order.comment && (
@@ -206,7 +206,7 @@ export default function DriverOrdersPage() {
                       <p className="text-xs text-muted-foreground">{order.car_class === "economy" ? "Эконом" : order.car_class === "comfort" ? "Комфорт" : "Бизнес"}</p>
                     </div>
                     <div className="text-right">
-                      <p className="font-medium">{order.price ? Number(order.price).toFixed(2) : "-"} ₽</p>
+                      <p className="font-medium">{order.price ? Number(order.price).toFixed(2) : "-"} BYN</p>
                     </div>
                   </div>
                   {order.comment && (
@@ -252,7 +252,7 @@ export default function DriverOrdersPage() {
                       <p className="text-xs text-muted-foreground">{order.car_class === "economy" ? "Эконом" : order.car_class === "comfort" ? "Комфорт" : "Бизнес"}</p>
                     </div>
                     <div className="text-right">
-                      <p className="font-medium">{order.price ? Number(order.price).toFixed(2) : "-"} ₽</p>
+                      <p className="font-medium">{order.price ? Number(order.price).toFixed(2) : "-"} BYN</p>
                     </div>
                   </div>
                   {order.comment && (

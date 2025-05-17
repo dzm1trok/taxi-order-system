@@ -88,7 +88,7 @@ export default function OrdersPage() {
                         <p className="text-xs text-muted-foreground">{order.distance ? `${Number(order.distance).toFixed(2)} км` : "-"}</p>
                       </div>
                       <div className="text-right">
-                        <p className="font-medium">{order.price ? Number(order.price).toFixed(2) : "-"} ₽</p>
+                        <p className="font-medium">{order.price ? Number(order.price).toFixed(2) : "-"} BYN</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2 text-sm">

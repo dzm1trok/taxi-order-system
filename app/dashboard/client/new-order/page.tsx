@@ -184,7 +184,7 @@ export default function NewOrderPage() {
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="font-medium">{distance ? (Math.ceil(distance / 1000) * 0.75).toFixed(2) : '0.00'} ₽</p>
+                        <p className="font-medium">{distance ? (Math.ceil(distance / 1000) * 0.75).toFixed(2) : '0.00'} BYN</p>
                       </div>
                     </div>
                   </TabsContent>
@@ -198,7 +198,7 @@ export default function NewOrderPage() {
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="font-medium">{distance ? (Math.ceil(distance / 1000) * 1.5).toFixed(2) : '0.00'} ₽</p>
+                        <p className="font-medium">{distance ? (Math.ceil(distance / 1000) * 1.5).toFixed(2) : '0.00'} BYN</p>
                       </div>
                     </div>
                   </TabsContent>
@@ -212,7 +212,7 @@ export default function NewOrderPage() {
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="font-medium">{distance ? (Math.ceil(distance / 1000) * 2).toFixed(2) : '0.00'} ₽</p>
+                        <p className="font-medium">{distance ? (Math.ceil(distance / 1000) * 2).toFixed(2) : '0.00'} BYN</p>
                       </div>
                     </div>
                   </TabsContent>
@@ -295,7 +295,7 @@ export default function NewOrderPage() {
                 </div>
                 <div className="flex justify-between font-medium pt-2 border-t">
                   <span>Итого:</span>
-                  <span>{price ? price.toFixed(2) : '0.00'} ₽</span>
+                  <span>{price ? price.toFixed(2) : '0.00'} BYN</span>
                 </div>
               </div>
             </CardContent>
