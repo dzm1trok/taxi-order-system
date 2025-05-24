@@ -48,7 +48,7 @@ export default function DriverStatsPage() {
                 <Banknote className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">1,250 ₽</div>
+                <div className="text-2xl font-bold">1,250 BYN</div>
                 <p className="text-xs text-muted-foreground">+12% по сравнению со вчера</p>
               </CardContent>
             </Card>
@@ -78,7 +78,7 @@ export default function DriverStatsPage() {
                 <TrendingUp className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">250 ₽</div>
+                <div className="text-2xl font-bold">250 BYN</div>
                 <p className="text-xs text-muted-foreground">+15% по сравнению со вчера</p>
               </CardContent>
             </Card>
@@ -162,7 +162,7 @@ export default function DriverStatsPage() {
                       <Banknote className="h-3 w-3 mr-1" />
                       Наличные
                     </div>
-                    <div className="text-right font-medium">290 ₽</div>
+                    <div className="text-right font-medium">290 BYN</div>
                   </div>
                   <div className="grid grid-cols-5 p-4">
                     <div className="text-muted-foreground">#1232</div>
@@ -172,7 +172,7 @@ export default function DriverStatsPage() {
                       <CreditCard className="h-3 w-3 mr-1" />
                       Карта
                     </div>
-                    <div className="text-right font-medium">320 ₽</div>
+                    <div className="text-right font-medium">320 BYN</div>
                   </div>
                   <div className="grid grid-cols-5 p-4">
                     <div className="text-muted-foreground">#1231</div>
@@ -182,7 +182,7 @@ export default function DriverStatsPage() {
                       <CreditCard className="h-3 w-3 mr-1" />
                       Карта
                     </div>
-                    <div className="text-right font-medium">270 ₽</div>
+                    <div className="text-right font-medium">270 BYN</div>
                   </div>
                 </div>
               </div>

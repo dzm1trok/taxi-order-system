@@ -210,7 +210,7 @@ export default function PaymentsPage() {
       ),
       cell: ({ row }) => {
         const amount = Number.parseFloat(row.getValue("amount"))
-        return <div>{amount.toFixed(0)} ₽</div>
+        return <div>{amount.toFixed(0)} BYN</div>
       },
     },
     {

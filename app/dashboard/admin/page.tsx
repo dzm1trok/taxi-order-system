@@ -72,7 +72,7 @@ export default function AdminDashboard() {
             <CreditCard className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">₽ 324,500</div>
+            <div className="text-2xl font-bold">BYN 324,500</div>
             <p className="text-xs text-muted-foreground">Общая сумма платежей</p>
             <div className="mt-4">
               <Link href="/dashboard/admin/payments">

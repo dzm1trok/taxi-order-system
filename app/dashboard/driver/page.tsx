@@ -134,7 +134,7 @@ export default function DriverDashboard() {
             <Banknote className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">1,250 ₽</div>
+            <div className="text-2xl font-bold">1,250 BYN</div>
             <p className="text-xs text-muted-foreground">+12% по сравнению со вчера</p>
           </CardContent>
         </Card>
@@ -210,7 +210,7 @@ export default function DriverDashboard() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-bold">280 ₽</p>
+                    <p className="font-bold">15 BYN</p>
                     <p className="text-xs text-muted-foreground">3.5 км</p>
                   </div>
                 </div>
@@ -243,7 +243,7 @@ export default function DriverDashboard() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-bold">350 ₽</p>
+                    <p className="font-bold">25 BYN</p>
                     <p className="text-xs text-muted-foreground">5.2 км</p>
                   </div>
                 </div>
@@ -268,7 +268,7 @@ export default function DriverDashboard() {
               <div className="p-4 border rounded-md">
                 <div className="flex justify-between items-start mb-4">
                   <Badge>В процессе</Badge>
-                  <p className="font-bold">320 ₽</p>
+                  <p className="font-bold">32 BYN</p>
                 </div>
 
                 <div className="space-y-3">

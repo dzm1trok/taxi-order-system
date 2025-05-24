@@ -570,11 +570,11 @@ export default function DriverProfilePage() {
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Заработано за неделю:</span>
-                      <span>8,450 ₽</span>
+                      <span>8,450 BYN</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Заработано за месяц:</span>
-                      <span>32,150 ₽</span>
+                      <span>32,150 BYN</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Следующая выплата:</span>
