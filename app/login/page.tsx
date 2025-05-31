@@ -1,8 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { redirect, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -11,9 +11,17 @@ import { Car } from "lucide-react"
 import { toast } from "sonner"
 
 export default function LoginPage() {
+  const auth = localStorage.getItem('user');
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+
+  useEffect(() => {
+    if(auth){
+      const userData = JSON.parse(auth);
+      router.push(`/dashboard/${userData.role}`);
+    }
+  }, [auth, router]);
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -50,6 +58,7 @@ export default function LoginPage() {
       
       toast.success("Вход выполнен успешно!")
       router.push(`/dashboard/${data.user.role}`)
+
     } catch (error: any) {
       // Error is already set above, no need to set it again
       if (!error.message.includes("Login failed")) {
