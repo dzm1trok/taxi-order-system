@@ -356,10 +356,6 @@ export default function ClientProfilePage() {
                     <User className="h-4 w-4 mr-2" />
                     Личные
                   </TabsTrigger>
-                  <TabsTrigger value="payment">
-                    <CreditCard className="h-4 w-4 mr-2" />
-                    Оплата
-                  </TabsTrigger>
                   <TabsTrigger value="security">
                     <Lock className="h-4 w-4 mr-2" />
                     Безопасность
@@ -434,30 +430,6 @@ export default function ClientProfilePage() {
                   )}
                 </CardFooter>
               </form>
-            </TabsContent>
-
-            <TabsContent value="payment">
-              <CardContent className="space-y-4">
-                <div className="rounded-lg border p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <CreditCard className="h-5 w-5" />
-                      <div>
-                        <p className="font-medium">Visa **** 4567</p>
-                        <p className="text-xs text-muted-foreground">Истекает 12/25</p>
-                      </div>
-                    </div>
-                    <Button variant="ghost" size="sm">
-                      Удалить
-                    </Button>
-                  </div>
-                </div>
-
-                <Button variant="outline" className="w-full">
-                  <CreditCard className="mr-2 h-4 w-4" />
-                  Добавить новую карту
-                </Button>
-              </CardContent>
             </TabsContent>
 
             <TabsContent value="security">
