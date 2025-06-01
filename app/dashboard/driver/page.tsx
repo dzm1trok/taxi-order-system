@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
-import { Car, Clock, CreditCard, MapPin, Star, Banknote } from "lucide-react"
+import { Car, Clock, CreditCard, MapPin, Star, Banknote, User, MessageSquare } from "lucide-react"
 import { toast } from "sonner"
 
 interface User {
@@ -25,6 +25,12 @@ export default function DriverDashboard() {
   const [isOnline, setIsOnline] = useState(false)
   const [loading, setLoading] = useState(true)
   const [updatingStatus, setUpdatingStatus] = useState(false)
+  const [totalEarnings, setTotalEarnings] = useState(0)
+  const [completedOrdersCount, setCompletedOrdersCount] = useState(0)
+  const [totalDistance, setTotalDistance] = useState(0)
+  const [availableOrders, setAvailableOrders] = useState<any[]>([])
+  const [currentOrder, setCurrentOrder] = useState<any>(null)
+  const driverId = 1; // This should be replaced with actual driver ID from auth
 
   useEffect(() => {
     // Get user data from localStorage
@@ -36,6 +42,43 @@ export default function DriverDashboard() {
     }
     setLoading(false)
   }, [])
+
+  useEffect(() => {
+    // Fetch completed orders to calculate earnings and count
+    fetch(`/api/orders?driver_id=${driverId}&status=completed`)
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          const earnings = data.reduce((sum, order) => sum + (Number(order.price) || 0), 0)
+          const distance = data.reduce((sum, order) => sum + (Number(order.distance) || 0), 0)
+          setTotalEarnings(earnings)
+          setCompletedOrdersCount(data.length)
+          setTotalDistance(distance)
+        }
+      })
+  }, [])
+
+  useEffect(() => {
+    // Fetch available orders
+    fetch('/api/orders?available=1')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setAvailableOrders(data)
+        }
+      })
+  }, [])
+
+  useEffect(() => {
+    // Fetch current active order
+    fetch(`/api/orders?driver_id=${driverId}&status=accepted`)
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data) && data.length > 0) {
+          setCurrentOrder(data[0]) // Берем первый заказ, так как у водителя может быть только один активный заказ
+        }
+      })
+  }, [driverId])
 
   const handleStatusChange = async (checked: boolean) => {
     if (!user) return
@@ -92,6 +135,108 @@ export default function DriverDashboard() {
     }
   }
 
+  const handleAcceptOrder = async (orderId: number) => {
+    try {
+      const response = await fetch('/api/orders', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: orderId, action: 'accept' })
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to accept order')
+      }
+
+      // Update available orders and set current order
+      const acceptedOrder = availableOrders.find(order => order.id === orderId)
+      if (acceptedOrder) {
+        setCurrentOrder(acceptedOrder)
+        setAvailableOrders(prev => prev.filter(order => order.id !== orderId))
+      }
+
+      toast.success('Заказ принят')
+    } catch (error) {
+      console.error('Error accepting order:', error)
+      toast.error('Не удалось принять заказ')
+    }
+  }
+
+  const handleDeclineOrder = async (orderId: number) => {
+    try {
+      const response = await fetch('/api/orders', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: orderId, action: 'decline' })
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to decline order')
+      }
+
+      // Remove declined order from available orders
+      setAvailableOrders(prev => prev.filter(order => order.id !== orderId))
+      toast.success('Заказ отклонен')
+    } catch (error) {
+      console.error('Error declining order:', error)
+      toast.error('Не удалось отклонить заказ')
+    }
+  }
+
+  const handleCompleteOrder = async () => {
+    if (!currentOrder) return
+
+    try {
+      const response = await fetch('/api/orders', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: currentOrder.id, action: 'complete' })
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to complete order')
+      }
+
+      setCurrentOrder(null)
+      toast.success('Заказ завершен')
+      
+      // Refresh completed orders count and earnings
+      fetch(`/api/orders?driver_id=${driverId}&status=completed`)
+        .then(res => res.json())
+        .then(data => {
+          if (Array.isArray(data)) {
+            const earnings = data.reduce((sum, order) => sum + (Number(order.price) || 0), 0)
+            setTotalEarnings(earnings)
+            setCompletedOrdersCount(data.length)
+          }
+        })
+    } catch (error) {
+      console.error('Error completing order:', error)
+      toast.error('Не удалось завершить заказ')
+    }
+  }
+
+  const handleCancelOrder = async () => {
+    if (!currentOrder) return
+
+    try {
+      const response = await fetch('/api/orders', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: currentOrder.id, action: 'decline' })
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to cancel order')
+      }
+
+      setCurrentOrder(null)
+      toast.success('Заказ отменен')
+    } catch (error) {
+      console.error('Error cancelling order:', error)
+      toast.error('Не удалось отменить заказ')
+    }
+  }
+
   if (loading) {
     return <div>Loading...</div>
   }
@@ -130,12 +275,11 @@ export default function DriverDashboard() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Заработок сегодня</CardTitle>
+            <CardTitle className="text-sm font-medium">Общий заработок</CardTitle>
             <Banknote className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">1,250 BYN</div>
-            <p className="text-xs text-muted-foreground">+12% по сравнению со вчера</p>
+            <div className="text-2xl font-bold">{totalEarnings.toFixed(2)} BYN</div>
           </CardContent>
         </Card>
         <Card>
@@ -144,8 +288,7 @@ export default function DriverDashboard() {
             <Car className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">5</div>
-            <p className="text-xs text-muted-foreground">Сегодня</p>
+            <div className="text-2xl font-bold">{completedOrdersCount}</div>
           </CardContent>
         </Card>
         <Card>
@@ -173,12 +316,11 @@ export default function DriverDashboard() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Время в сети</CardTitle>
+            <CardTitle className="text-sm font-medium">Всего проехано</CardTitle>
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">6ч 30м</div>
-            <p className="text-xs text-muted-foreground">Сегодня</p>
+            <div className="text-2xl font-bold">{totalDistance.toFixed(1)} км</div>
           </CardContent>
         </Card>
       </div>
@@ -190,71 +332,53 @@ export default function DriverDashboard() {
             <CardDescription>Доступные заказы для принятия</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex justify-between items-start">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <MapPin className="h-4 w-4 text-muted-foreground" />
-                      <span className="font-medium">ул. Пушкина, 15 → ТЦ "Европа"</span>
-                    </div>
-                    <div className="flex items-center gap-4 text-sm">
-                      <div className="flex items-center gap-1">
-                        <Clock className="h-3 w-3 text-muted-foreground" />
-                        <span>~15 мин</span>
+            {availableOrders.length === 0 ? (
+              <p className="text-center text-muted-foreground">Нет доступных заказов</p>
+            ) : (
+              availableOrders.map(order => (
+                <Card key={order.id}>
+                  <CardContent className="p-4">
+                    <div className="flex justify-between items-start">
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <MapPin className="h-4 w-4 text-muted-foreground" />
+                          <span className="font-medium">{order.from_address} → {order.to_address}</span>
+                        </div>
+                        <div className="flex items-center gap-4 text-sm">
+                          <div className="flex items-center gap-1">
+                            <Clock className="h-3 w-3 text-muted-foreground" />
+                            <span>~{Math.ceil(order.distance * 2)} мин</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <p className="text-sm"> Клиент: {order.first_name} {order.last_name}
+                            </p>
+                          </div>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <CreditCard className="h-3 w-3 text-muted-foreground" />
-                        <span>Карта</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-bold">15 BYN</p>
-                    <p className="text-xs text-muted-foreground">3.5 км</p>
-                  </div>
-                </div>
-                <div className="flex justify-end gap-2 mt-4">
-                  <Button variant="outline" size="sm">
-                    Отклонить
-                  </Button>
-                  <Button size="sm">Принять</Button>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex justify-between items-start">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <MapPin className="h-4 w-4 text-muted-foreground" />
-                      <span className="font-medium">Вокзал → ул. Гагарина, 42</span>
-                    </div>
-                    <div className="flex items-center gap-4 text-sm">
-                      <div className="flex items-center gap-1">
-                        <Clock className="h-3 w-3 text-muted-foreground" />
-                        <span>~20 мин</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Banknote className="h-3 w-3 text-muted-foreground" />
-                        <span>Наличные</span>
+                      <div className="text-right">
+                        <p className="font-bold">{Number(order.price).toFixed(2)} BYN</p>
+                        <p className="text-xs text-muted-foreground">{Number(order.distance).toFixed(1)} км</p>
                       </div>
                     </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-bold">25 BYN</p>
-                    <p className="text-xs text-muted-foreground">5.2 км</p>
-                  </div>
-                </div>
-                <div className="flex justify-end gap-2 mt-4">
-                  <Button variant="outline" size="sm">
-                    Отклонить
-                  </Button>
-                  <Button size="sm">Принять</Button>
-                </div>
-              </CardContent>
-            </Card>
+                    <div className="flex justify-end gap-2 mt-4">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => handleDeclineOrder(order.id)}
+                      >
+                        Отклонить
+                      </Button>
+                      <Button 
+                        size="sm"
+                        onClick={() => handleAcceptOrder(order.id)}
+                      >
+                        Принять
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            )}
           </CardContent>
         </Card>
 
@@ -265,47 +389,67 @@ export default function DriverDashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="p-4 border rounded-md">
-                <div className="flex justify-between items-start mb-4">
-                  <Badge>В процессе</Badge>
-                  <p className="font-bold">32 BYN</p>
-                </div>
-
-                <div className="space-y-3">
-                  <div className="flex items-start gap-2">
-                    <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
-                    <div>
-                      <p className="text-sm font-medium">Маршрут</p>
-                      <p className="text-sm">ул. Ленина, 10 → Бизнес-центр "Высота"</p>
+              {currentOrder ? (
+                <div className="p-4 border rounded-md">
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="space-y-1">
+                      <Badge>В процессе</Badge>
+                      <p className="text-xs text-muted-foreground">
+                        Создан: {new Date(currentOrder.created_at).toLocaleString()}
+                      </p>
                     </div>
+                    <p className="font-bold">{Number(currentOrder.price).toFixed(2)} BYN</p>
                   </div>
 
-                  <div className="flex items-start gap-2">
-                    <Clock className="h-4 w-4 text-muted-foreground mt-0.5" />
-                    <div>
-                      <p className="text-sm font-medium">Время</p>
-                      <p className="text-sm">Начало: 14:30, Ожидаемое прибытие: 14:55</p>
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-2">
+                      <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
+                      <div>
+                        <p className="text-sm font-medium">Маршрут</p>
+                        <p className="text-sm">{currentOrder.from_address} → {currentOrder.to_address}</p>
+                      </div>
                     </div>
+
+                    <div className="flex items-start gap-2">
+                      <Clock className="h-4 w-4 text-muted-foreground mt-0.5" />
+                      <div>
+                        <p className="text-sm font-medium">Расстояние</p>
+                        <p className="text-sm">{Number(currentOrder.distance).toFixed(1)} км</p>
+                      </div>
+                    </div>
+
+                    {(currentOrder.first_name || currentOrder.last_name) && (
+                      <div className="flex items-start gap-2">
+                        <User className="h-4 w-4 text-muted-foreground mt-0.5" />
+                        <div>
+                          <p className="text-sm font-medium">Клиент</p>
+                          <p className="text-sm">
+                            {currentOrder.first_name} {currentOrder.last_name}
+                            {currentOrder.phone && ` • ${currentOrder.phone}`}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {currentOrder.comment && (
+                      <div className="flex items-start gap-2">
+                        <MessageSquare className="h-4 w-4 text-muted-foreground mt-0.5" />
+                        <div>
+                          <p className="text-sm font-medium">Комментарий</p>
+                          <p className="text-sm">{currentOrder.comment}</p>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
-                  <div className="flex items-start gap-2">
-                    <CreditCard className="h-4 w-4 text-muted-foreground mt-0.5" />
-                    <div>
-                      <p className="text-sm font-medium">Оплата</p>
-                      <p className="text-sm">Банковская карта</p>
-                    </div>
+                  <div className="flex justify-between gap-2 mt-4">
+                    <Button variant="outline" onClick={handleCancelOrder}>Отменить</Button>
+                    <Button onClick={handleCompleteOrder}>Завершить</Button>
                   </div>
                 </div>
-
-                <div className="flex justify-between gap-2 mt-4">
-                  <Button variant="outline">Отменить</Button>
-                  <Button>Завершить</Button>
-                </div>
-              </div>
-
-              <div className="h-48 w-full bg-muted rounded-md flex items-center justify-center">
-                <p className="text-muted-foreground">Карта маршрута</p>
-              </div>
+              ) : (
+                <p className="text-center text-muted-foreground">Нет активных заказов</p>
+              )}
             </div>
           </CardContent>
         </Card>

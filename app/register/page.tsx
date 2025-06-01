@@ -76,10 +76,7 @@ export default function RegisterPage() {
           <CardDescription>Создайте аккаунт для использования сервиса</CardDescription>
         </CardHeader>
         <Tabs defaultValue={role}>
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="client">Клиент</TabsTrigger>
-            <TabsTrigger value="driver">Водитель</TabsTrigger>
-          </TabsList>
+          
           <TabsContent value="client">
             <form onSubmit={handleRegister}>
               <CardContent className="space-y-4 pt-4">
@@ -99,7 +96,7 @@ export default function RegisterPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="client-phone">Телефон</Label>
-                  <Input id="client-phone" name="client-phone" type="tel" placeholder="+7 (999) 123-45-67" required />
+                  <Input id="client-phone" name="client-phone" type="tel" placeholder="+375 (00) 12-34-567" required />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="client-password">Пароль</Label>
@@ -142,7 +139,7 @@ export default function RegisterPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="driver-phone">Телефон</Label>
-                  <Input id="driver-phone" name="driver-phone" type="tel" placeholder="+7 (999) 123-45-67" required />
+                  <Input id="driver-phone" name="driver-phone" type="tel" placeholder="+375 (00) 12-34-567" required />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="driver-car-model">Модель автомобиля</Label>

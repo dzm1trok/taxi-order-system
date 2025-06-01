@@ -254,16 +254,7 @@ export default function NewOrderPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <RadioGroup defaultValue="card">
-                <div className="flex items-center space-x-2 border rounded-md p-3">
-                  <RadioGroupItem value="card" id="payment-card" />
-                  <Label htmlFor="payment-card" className="flex items-center gap-2 flex-1">
-                    <CreditCard className="h-4 w-4" />
-                    <div>
-                      <p>Банковская карта</p>
-                      <p className="text-sm text-muted-foreground">**** 4567</p>
-                    </div>
-                  </Label>
-                </div>
+                
                 <div className="flex items-center space-x-2 border rounded-md p-3">
                   <RadioGroupItem value="cash" id="payment-cash" />
                   <Label htmlFor="payment-cash" className="flex items-center gap-2">

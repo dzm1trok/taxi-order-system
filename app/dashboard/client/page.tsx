@@ -10,18 +10,79 @@ interface User {
   firstName: string
   lastName: string
   role: "client" | "driver"
+  email: string
 }
 
 export default function ClientDashboard() {
   const [user, setUser] = useState<User | null>(null)
+  const [completedOrdersCount, setCompletedOrdersCount] = useState(0)
+  const [activeOrdersCount, setActiveOrdersCount] = useState(0)
+  const [lastOrder, setLastOrder] = useState<any>(null)
+  const [recentOrders, setRecentOrders] = useState<any[]>([])
 
   useEffect(() => {
     const userData = localStorage.getItem("user")
     if (userData) {
       const parsedUser = JSON.parse(userData)
       setUser(parsedUser)
+      
+      // Fetch orders count and recent orders
+      const userEmail = parsedUser.email
+      if (userEmail) {
+        fetch(`/api/orders?email=${encodeURIComponent(userEmail)}`)
+          .then(res => res.json())
+          .then(data => {
+            if (Array.isArray(data)) {
+              const completedOrders = data.filter(order => order.status === 'completed')
+              const activeOrders = data.filter(order => ['pending', 'accepted', 'in_progress'].includes(order.status))
+              setCompletedOrdersCount(completedOrders.length)
+              setActiveOrdersCount(activeOrders.length)
+              
+              // Get the most recent orders
+              if (data.length > 0) {
+                const sortedOrders = [...data].sort((a, b) => 
+                  new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+                )
+                setLastOrder(sortedOrders[0])
+                setRecentOrders(sortedOrders.slice(0, 3))
+              }
+            }
+          })
+      }
     }
   }, [])
+
+  const handleReorder = async (order: any) => {
+    if (!user?.email) return
+
+    const orderData = {
+      email: user.email,
+      from_address: order.from_address,
+      to_address: order.to_address,
+      car_class: order.car_class,
+      price: order.price,
+      distance: order.distance,
+      comment: order.comment,
+      status: 'pending'
+    }
+
+    try {
+      const res = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderData)
+      })
+
+      if (res.ok) {
+        window.location.href = "/dashboard/client/orders"
+      } else {
+        const error = await res.json()
+        alert('Ошибка при создании заказа: ' + (error?.error || ''))
+      }
+    } catch (error) {
+      alert('Ошибка при создании заказа')
+    }
+  }
 
   if (!user) {
     return null // or a loading state
@@ -48,8 +109,12 @@ export default function ClientDashboard() {
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">15 минут назад</div>
-            <p className="text-xs text-muted-foreground">Поездка из ул. Ленина, 10 в ТЦ "Мега"</p>
+            <div className="text-2xl font-bold">
+              {lastOrder ? new Date(lastOrder.created_at).toLocaleString() : 'Нет заказов'}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {lastOrder ? `${lastOrder.from_address} → ${lastOrder.to_address}` : 'У вас пока нет заказов'}
+            </p>
             <div className="mt-4">
               <Link href="/dashboard/client/orders">
                 <Button variant="outline" size="sm">
@@ -65,7 +130,7 @@ export default function ClientDashboard() {
             <Car className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">0</div>
+            <div className="text-2xl font-bold">{activeOrdersCount}</div>
             <p className="text-xs text-muted-foreground">У вас нет активных заказов</p>
             <div className="mt-4">
               <Link href="/dashboard/client/new-order">
@@ -82,7 +147,7 @@ export default function ClientDashboard() {
             <History className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">12</div>
+            <div className="text-2xl font-bold">{completedOrdersCount}</div>
             <p className="text-xs text-muted-foreground">Всего выполненных заказов</p>
             <div className="mt-4">
               <Link href="/dashboard/client/orders">
@@ -103,42 +168,23 @@ export default function ClientDashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="flex items-center justify-between border-b pb-2">
-                <div className="flex items-center">
-                  <MapPin className="mr-2 h-4 w-4 text-muted-foreground" />
-                  <div>
-                    <p className="text-sm font-medium">Дом → Работа</p>
-                    <p className="text-xs text-muted-foreground">ул. Ленина, 10 → Бизнес-центр "Высота"</p>
+              {recentOrders.map((order, index) => (
+                <div key={order.id} className="flex items-center justify-between border-b pb-2">
+                  <div className="flex items-center">
+                    <MapPin className="mr-2 h-4 w-4 text-muted-foreground" />
+                    <div>
+                      <p className="text-sm font-medium">{order.from_address} → {order.to_address}</p>
+                      <p className="text-xs text-muted-foreground">{new Date(order.created_at).toLocaleString()}</p>
+                    </div>
                   </div>
+                  <Button variant="ghost" size="sm" onClick={() => handleReorder(order)}>
+                    Заказать
+                  </Button>
                 </div>
-                <Button variant="ghost" size="sm">
-                  Заказать
-                </Button>
-              </div>
-              <div className="flex items-center justify-between border-b pb-2">
-                <div className="flex items-center">
-                  <MapPin className="mr-2 h-4 w-4 text-muted-foreground" />
-                  <div>
-                    <p className="text-sm font-medium">Дом → ТЦ "Мега"</p>
-                    <p className="text-xs text-muted-foreground">ул. Ленина, 10 → ТЦ "Мега"</p>
-                  </div>
-                </div>
-                <Button variant="ghost" size="sm">
-                  Заказать
-                </Button>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <MapPin className="mr-2 h-4 w-4 text-muted-foreground" />
-                  <div>
-                    <p className="text-sm font-medium">Работа → Дом</p>
-                    <p className="text-xs text-muted-foreground">Бизнес-центр "Высота" → ул. Ленина, 10</p>
-                  </div>
-                </div>
-                <Button variant="ghost" size="sm">
-                  Заказать
-                </Button>
-              </div>
+              ))}
+              {recentOrders.length === 0 && (
+                <p className="text-sm text-muted-foreground text-center">Нет истории заказов</p>
+              )}
             </div>
           </CardContent>
         </Card>

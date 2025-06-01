@@ -407,10 +407,7 @@ export default function DriverProfilePage() {
                     <Car className="h-4 w-4 mr-2" />
                     Автомобиль
                   </TabsTrigger>
-                  <TabsTrigger value="payment">
-                    <CreditCard className="h-4 w-4 mr-2" />
-                    Оплата
-                  </TabsTrigger>
+                  
                   <TabsTrigger value="security">
                     <Lock className="h-4 w-4 mr-2" />
                     Безопасность
@@ -548,42 +545,7 @@ export default function DriverProfilePage() {
               </form>
             </TabsContent>
 
-            <TabsContent value="payment">
-              <CardContent className="space-y-4">
-                <div className="rounded-lg border p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <CreditCard className="h-5 w-5" />
-                      <div>
-                        <p className="font-medium">Сбербанк **** 1234</p>
-                        <p className="text-xs text-muted-foreground">Для получения оплаты</p>
-                      </div>
-                    </div>
-                    <Button variant="ghost" size="sm">
-                      Изменить
-                    </Button>
-                  </div>
-                </div>
-
-                <div className="rounded-lg border p-4">
-                  <h3 className="font-medium mb-2">Статистика выплат</h3>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Заработано за неделю:</span>
-                      <span>8,450 BYN</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Заработано за месяц:</span>
-                      <span>32,150 BYN</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Следующая выплата:</span>
-                      <span>15.05.2023</span>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </TabsContent>
+            
 
             <TabsContent value="security">
               <form onSubmit={handlePasswordChange}>

@@ -25,7 +25,6 @@ export function MainNav({ userRole }: MainNavProps) {
   const driverLinks = [
     { href: "/dashboard/driver", label: "Главная" },
     { href: "/dashboard/driver/orders", label: "Заказы" },
-    { href: "/dashboard/driver/stats", label: "Статистика" },
     { href: "/dashboard/driver/profile", label: "Профиль" },
   ]
 

@@ -15,20 +15,15 @@ export default function Home() {
             <Link href="#features" className="text-sm font-medium hover:underline underline-offset-4">
               Возможности
             </Link>
-            <Link href="#how-it-works" className="text-sm font-medium hover:underline underline-offset-4">
-              Как это работает
-            </Link>
-            <Link href="#contact" className="text-sm font-medium hover:underline underline-offset-4">
-              Контакты
+            <Link href="#features" className="text-sm font-medium hover:underline underline-offset-4">
+              Наши преимущества
             </Link>
           </nav>
           <div className="flex gap-4">
             <Link href="/login">
-              <Button variant="outline">Войти</Button>
+              <Button>Войти</Button>
             </Link>
-            <Link href="/register">
-              <Button>Регистрация</Button>
-            </Link>
+            
           </div>
         </div>
       </header>
@@ -55,13 +50,6 @@ export default function Home() {
                 </div>
               </div>
               <div className="flex justify-center">
-                <div className="relative w-full max-w-[500px] aspect-video rounded-xl overflow-hidden shadow-xl">
-                  <img
-                    src="/placeholder.svg?height=400&width=600"
-                    alt="Такси сервис"
-                    className="object-cover w-full h-full"
-                  />
-                </div>
               </div>
             </div>
           </div>
@@ -119,18 +107,8 @@ export default function Home() {
             <Car className="h-5 w-5" />
             <span className="text-lg font-bold">ТаксиСервис</span>
           </div>
-          <nav className="flex gap-4 sm:gap-6">
-            <Link href="#" className="text-sm hover:underline underline-offset-4">
-              Условия использования
-            </Link>
-            <Link href="#" className="text-sm hover:underline underline-offset-4">
-              Политика конфиденциальности
-            </Link>
-            <Link href="#" className="text-sm hover:underline underline-offset-4">
-              Контакты
-            </Link>
-          </nav>
-          <div className="flex-1 text-center md:text-right text-sm">© 2023 ТаксиСервис. Все права защищены.</div>
+          
+          <div className="flex-1 text-center md:text-right text-sm">© 2025 ТаксиСервис.</div>
         </div>
       </footer>
     </div>
